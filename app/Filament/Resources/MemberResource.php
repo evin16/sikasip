@@ -56,8 +56,10 @@ class MemberResource extends Resource
                 // Tambahkan filter jika diperlukan
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                ->visible(fn () => !auth()->user()?->hasRole('Bendahara')),
+                Tables\Actions\DeleteAction::make()
+                ->visible(fn () => !auth()->user()?->hasRole('Bendahara')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -16,6 +16,12 @@ class UserResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $navigationGroup = 'Pelindung';
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->hasRole('Super Admin');
+    }
+
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
