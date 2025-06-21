@@ -1,15 +1,16 @@
 <?php
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CategoryResource\Pages;
-use App\Models\Category;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\TextColumn;
+use App\Models\Category;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\BadgeColumn;
+use App\Filament\Resources\CategoryResource\Pages;
 
 class CategoryResource extends Resource
 {
@@ -18,7 +19,11 @@ class CategoryResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-tag';
 
     protected static ?string $navigationGroup = 'Kas Umum';
-
+    public static function shouldRegisterNavigation(): bool
+    {
+        return !Auth::user()?->hasRole('Sekretaris');
+    }
+    
     protected static ?string $navigationLabel = 'Kategori';
     public static function getNavigationBadge(): ?string
     {
@@ -64,12 +69,15 @@ class CategoryResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                ->visible(fn () => !auth()->user()->hasRole('Ketua')),
+                Tables\Actions\DeleteAction::make()
+                ->visible(fn () => !auth()->user()->hasRole('Ketua')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                    ->visible(fn () => !auth()->user()->hasRole('Ketua')),
                 ]),
             ]);
     }

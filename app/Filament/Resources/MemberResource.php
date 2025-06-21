@@ -57,13 +57,14 @@ class MemberResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                ->visible(fn () => !auth()->user()?->hasRole('Bendahara')),
+                ->visible(fn () => !auth()->user()->hasAnyRole(['Bendahara', 'Ketua'])),
                 Tables\Actions\DeleteAction::make()
-                ->visible(fn () => !auth()->user()?->hasRole('Bendahara')),
-            ])
+                ->visible(fn () => !auth()->user()->hasAnyRole(['Bendahara', 'Ketua'])),
+                ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                    ->visible(fn () => !auth()->user()->hasAnyRole(['Bendahara', 'Ketua'])),
                 ]),
             ]);
     }

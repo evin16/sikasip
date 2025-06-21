@@ -2,25 +2,26 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\DuesTransactionResource\Pages;
-use App\Models\DuesTransaction;
-use Carbon\Carbon;
 use Closure;
+use Carbon\Carbon;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Tables;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Filament\Forms\Components\DatePicker;
+use App\Models\DuesTransaction;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BadgeColumn;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Forms\Components\DatePicker;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\DuesTransactionResource\Pages;
 
 class DuesTransactionResource extends Resource
 {
@@ -29,6 +30,10 @@ class DuesTransactionResource extends Resource
 
     // Pengaturan Sidebar
     protected static ?string $navigationLabel = 'Transaksi Iuran';
+    public static function shouldRegisterNavigation(): bool
+    {
+        return !Auth::user()?->hasRole('Sekretaris');
+    }
     protected static ?string $navigationGroup = 'Kas Wajib';
     protected static ?int $navigationSort = 2;
 
@@ -156,12 +161,15 @@ class DuesTransactionResource extends Resource
             ->defaultSort('date', 'desc')
             ->filters([])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                ->visible(fn () => !auth()->user()->hasRole('Ketua')),
+                Tables\Actions\DeleteAction::make()
+                ->visible(fn () => !auth()->user()->hasRole('Ketua')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                    ->visible(fn () => !auth()->user()->hasRole('Ketua')),
                 ]),
             ]);
     }
